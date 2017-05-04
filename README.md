@@ -1,5 +1,7 @@
 # ember-batch-request
 
+[![NetflixOSS Lifecycle](https://img.shields.io/osslifecycle/Netflix/osstracker.svg)]()
+
 Adapter add on for making Batch Requests in Ember Applications.
 
   * Customizable Adapter
