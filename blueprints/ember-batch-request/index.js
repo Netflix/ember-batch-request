@@ -1,7 +1,7 @@
 module.exports = {
-  normalizeEntityName: function() {},
+  normalizeEntityName: function () {},
 
-  afterInstall: function() {
-    return this.addBowerPackageToProject('batch-request');
+  afterInstall: function () {
+    return this.addBowerPackageToProject('ember-batch-request');
   }
 };

@@ -1,6 +1,6 @@
 {
   "name": "ember-batch-request",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "Ember Addon for making Batch Requests",
   "author": "Netflix",
   "homepage": "https://github.com/Netflix/ember-batch-request",
@@ -27,7 +27,7 @@
     "node": "6.7.0"
   },
 
-  "license": "MIT",
+  "license": "Apache",
   "devDependencies": {
     "babel-eslint": "^6.1.2",
     "broccoli-asset-rev": "^2.4.5",
