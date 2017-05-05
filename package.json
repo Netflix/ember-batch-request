@@ -1,6 +1,6 @@
 {
   "name": "ember-batch-request",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "Ember Addon for making Batch Requests",
   "author": "Netflix",
   "homepage": "https://github.com/Netflix/ember-batch-request",
