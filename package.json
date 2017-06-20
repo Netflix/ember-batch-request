@@ -24,7 +24,7 @@
     "test": "ember try:each"
   },
   "engines": {
-    "node": "6.7.0"
+    "node": ">= 4"
   },
 
   "license": "Apache",
