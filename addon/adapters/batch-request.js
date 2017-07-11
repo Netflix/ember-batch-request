@@ -52,7 +52,7 @@ export default JSONAPIAdapter.extend({
       this._changeRootStateToInflight(item);
     });
     const payload = this._buildPayloadHash(requests);
-    const apiBatchUrl = this.buildURL(this.get('apiBatchUrl')).underscore();
+    const apiBatchUrl = this.buildURL(this.get('apiBatchUrl')).replace(this.get('apiBatchUrl').dasherize().pluralize(), this.get('apiBatchUrl'));
     const modelName = items[0]._internalModel.modelName;
 
     return this.store.adapterFor(modelName).ajax(apiBatchUrl, actionName, {
