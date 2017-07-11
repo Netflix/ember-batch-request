@@ -196,7 +196,7 @@ export default JSONAPIAdapter.extend({
       body = item.id;
     }
 
-    url = url.underscore().replace(this.get('host'), '');
+    url = url.replace(this.get('host'), '').underscore();
 
     return {
       method: actionName,
