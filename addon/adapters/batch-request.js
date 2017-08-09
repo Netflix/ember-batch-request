@@ -72,7 +72,7 @@ export default JSONAPIAdapter.extend({
       if (item.status === success) {
         completedResponses.push(item.response);
       } else {
-        errorResponses.push(item.response);
+        errorResponses.push(item);
       }
     });
 
@@ -157,8 +157,8 @@ export default JSONAPIAdapter.extend({
 
   _handleModelErrors(errorResponses, records) {
     if (errorResponses.length > 0) {
-      const errors = errorResponses[0][0].response;
-      const status = errorResponses[0][0].status;
+      const errors = errorResponses[0].response;
+      const status = errorResponses[0].status;
       const invalid = 422;
 
       records.forEach((record)=> {
