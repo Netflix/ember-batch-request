@@ -18,7 +18,7 @@ As any other ember-cli add on, run:
   
 ### Setup
 
-Since the [Rails middleware](https://github.com/Netflix/batch_request_api) depends on the url ```/api/v1/batch_sequential``` or ```/api/v1/batch_sequential```, please add the following config to environment.js
+Since the [Rails middleware](https://github.com/Netflix/batch_request_api) depends on the url ```/api/v1/batch_parallel``` or ```/api/v1/batch_sequential```, please add the following config to environment.js
 
 ```
 ENV.apiNamespace = 'api/v1';
