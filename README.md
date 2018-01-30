@@ -25,6 +25,12 @@ ENV.apiNamespace = 'api/v1';
 ENV.apiBatchUrl = 'batch_parallel'; (or batch_sequential)
 ```
 
+You can change the host
+
+```
+ENV.apiURL = 'http://example.com'
+```
+
 ### Usage
 
   **BatchCreate**
@@ -51,6 +57,14 @@ Just pass the option { skipStoreUpdate: true } in batchCreate or batchUpdate
 
   ```javascript
   this.get('store').batchCreate(arrayOfObjects, { skipStoreUpdate: true })
+  ```
+
+### How to change the default HTTP method during Create or Update
+
+Just pass the option { actionName: "PUT" } in batchCreate or batchUpdate
+
+  ```javascript
+  this.get('store').batchUpdate(arrayOfObjects, { actionName: "PUT" })
   ```
 
 ### Response
