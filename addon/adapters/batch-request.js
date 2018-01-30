@@ -9,6 +9,11 @@ inflector.uncountable('sequential');
 
 const { isPresent } = Ember;
 const { JSONAPIAdapter } = DS;
+const ACTION_NAME = {
+  CRAETE: 0,
+  UPDATE: 1,
+  DELETE: 2
+};
 
 export default JSONAPIAdapter.extend({
   init() {
@@ -23,30 +28,30 @@ export default JSONAPIAdapter.extend({
 
   batchCreate(items, options) {
     options = options || {};
-    let actionName = options.actionName || 'POST';
+    let httpMethod = options.httpMethod || 'POST';
     let skipStoreUpdate = options.skipStoreUpdate || false;
 
-    return this._batch(items, actionName, skipStoreUpdate);
+    return this._batch(items, ACTION_NAME.CRAETE, httpMethod, skipStoreUpdate);
   },
 
   batchUpdate(items, options) {
     options = options || {};
-    let actionName = options.actionName || 'PATCH';
+    let httpMethod = options.httpMethod || 'PATCH';
     let skipStoreUpdate = options.skipStoreUpdate || false;
 
-    return this._batch(items, actionName, skipStoreUpdate);
+    return this._batch(items, ACTION_NAME.UPDATE, httpMethod, skipStoreUpdate);
   },
 
   batchDelete(items) {
-    return this._batch(items, 'DELETE');
+    return this._batch(items, ACTION_NAME.DELETE, 'DELETE');
   },
 
-  _batch(items, actionName, skipStoreUpdate) {
+  _batch(items, actionName, httpMethod, skipStoreUpdate) {
     const records = items;
     const requests = [];
 
     records.forEach((item)=> {
-      const current = this._buildBatchPayload(item, actionName);
+      const current = this._buildBatchPayload(item, actionName, httpMethod);
 
       requests.push(current);
       this._changeRootStateToInflight(item);
@@ -55,7 +60,7 @@ export default JSONAPIAdapter.extend({
     const apiBatchUrl = this.buildURL(this.get('apiBatchUrl')).replace(this.get('apiBatchUrl').dasherize().pluralize(), this.get('apiBatchUrl'));
     const modelName = items[0]._internalModel.modelName;
 
-    return this.store.adapterFor(modelName).ajax(apiBatchUrl, actionName, {
+    return this.store.adapterFor(modelName).ajax(apiBatchUrl, httpMethod, {
       data: payload
     })
     .then((result)=> {
@@ -77,7 +82,7 @@ export default JSONAPIAdapter.extend({
     });
 
     // Deletes
-    if (actionName === 'DELETE') {
+    if (actionName === ACTION_NAME.DELETE) {
       this._unloadRecordFromStore(completedResponses, records);
     // Creates and Updates
     } else if (skipStoreUpdate === false) {
@@ -181,17 +186,17 @@ export default JSONAPIAdapter.extend({
     return payloadHash;
   },
 
-  _buildBatchPayload(item, actionName) {
+  _buildBatchPayload(item, actionName, httpMethod) {
     let body, url;
     const modelName = item._internalModel.modelName;
 
-    if (actionName === 'POST') {
+    if (actionName === ACTION_NAME.CRAETE) {
       url = this.urlForCreateRecord(modelName);
       body = item.serialize();
-    } else if (actionName === 'PATCH') {
+    } else if (actionName === ACTION_NAME.UPDATE) {
       url = this.urlForUpdateRecord(item.id, modelName);
       body = item.serialize();
-    } else if (actionName === 'DELETE') {
+    } else if (actionName === ACTION_NAME.DELETE) {
       url = this.urlForDeleteRecord(item.id, modelName);
       body = item.id;
     }
@@ -199,7 +204,7 @@ export default JSONAPIAdapter.extend({
     url = url.replace(this.get('host'), '').underscore();
 
     return {
-      method: actionName,
+      method: httpMethod,
       url,
       body
     };
