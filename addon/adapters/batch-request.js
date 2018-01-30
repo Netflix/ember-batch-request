@@ -31,7 +31,7 @@ export default JSONAPIAdapter.extend({
     let httpMethod = options.httpMethod || 'POST';
     let skipStoreUpdate = options.skipStoreUpdate || false;
 
-    return this._batch(items, ACTION_NAME.CRAETE, httpMethod, skipStoreUpdate);
+    return this._batch(items, ACTION_NAME.CRAETE, httpMethod, skipStoreUpdate, options.getIdsFunc);
   },
 
   batchUpdate(items, options) {
@@ -39,14 +39,14 @@ export default JSONAPIAdapter.extend({
     let httpMethod = options.httpMethod || 'PATCH';
     let skipStoreUpdate = options.skipStoreUpdate || false;
 
-    return this._batch(items, ACTION_NAME.UPDATE, httpMethod, skipStoreUpdate);
+    return this._batch(items, ACTION_NAME.UPDATE, httpMethod, skipStoreUpdate, options.getIdsFunc);
   },
 
   batchDelete(items) {
     return this._batch(items, ACTION_NAME.DELETE, 'DELETE');
   },
 
-  _batch(items, actionName, httpMethod, skipStoreUpdate) {
+  _batch(items, actionName, httpMethod, skipStoreUpdate, getIdsFunc) {
     const records = items;
     const requests = [];
 
@@ -64,11 +64,11 @@ export default JSONAPIAdapter.extend({
       data: payload
     })
     .then((result)=> {
-      return this._batchResponse(result, actionName, records, skipStoreUpdate);
+      return this._batchResponse(result, actionName, records, skipStoreUpdate, getIdsFunc);
     });
   },
 
-  _batchResponse(result, actionName, records, skipStoreUpdate) {
+  _batchResponse(result, actionName, records, skipStoreUpdate, getIdsFunc) {
     const errorResponses = [];
     const completedResponses = [];
     const success = 200;
@@ -83,10 +83,10 @@ export default JSONAPIAdapter.extend({
 
     // Deletes
     if (actionName === ACTION_NAME.DELETE) {
-      this._unloadRecordFromStore(completedResponses, records);
+      this._unloadRecordFromStore(completedResponses, records, getIdsFunc);
     // Creates and Updates
     } else if (skipStoreUpdate === false) {
-      this._updateStoreOnCreateOrUpdate(completedResponses, records, actionName);
+      this._updateStoreOnCreateOrUpdate(completedResponses, records, actionName, getIdsFunc);
     }
     this._handleModelErrors(errorResponses, records);
     this._cleanUpInflightModels(records);
@@ -120,10 +120,14 @@ export default JSONAPIAdapter.extend({
     }
   },
 
-  _unloadRecordFromStore(completedResponses, records) {
+  _unloadRecordFromStore(completedResponses, records, getIdsFunc) {
     completedResponses.forEach((body)=> {
       // a hack to handle parallel requests
-      if (body.constructor === Array) {
+      if (isPresent(getIdsFunc)) {
+        getIdsFunc(body).forEach((id) => {
+          records.findBy('id', id).unloadRecord();
+        });
+      } else if (body.constructor === Array) {
         const ids = body.mapBy('response')
                         .mapBy('data')
                         .mapBy('id');
@@ -139,11 +143,13 @@ export default JSONAPIAdapter.extend({
     });
   },
 
-  _updateStoreOnCreateOrUpdate(completedResponses, records, actionName) {
+  _updateStoreOnCreateOrUpdate(completedResponses, records, actionName, getIdsFunc) {
     completedResponses.forEach((body)=> {
       let ids;
 
-      if (body.constructor === Array) {
+      if (isPresent(getIdsFunc)) {
+        ids = getIdsFunc(body);
+      } else if (body.constructor === Array) {
         ids = body.mapBy('response.data.id');
       } else if (body.id) {
         ids = [body.id];
