@@ -22,19 +22,19 @@ export default JSONAPIAdapter.extend({
   },
 
   batchCreate(items, options) {
-    if (isPresent(options) && isPresent(options.skipStoreUpdate)) {
-      return this._batch(items, 'POST', options.skipStoreUpdate);
-    }
+    options = options || {};
+    let actionName = options.actionName || 'POST';
+    let skipStoreUpdate = options.skipStoreUpdate || false;
 
-    return this._batch(items, 'POST', false);
+    return this._batch(items, actionName, skipStoreUpdate);
   },
 
   batchUpdate(items, options) {
-    if (isPresent(options) && isPresent(options.skipStoreUpdate)) {
-      return this._batch(items, 'PATCH', options.skipStoreUpdate);
-    }
+    options = options || {};
+    let actionName = options.actionName || 'PATCH';
+    let skipStoreUpdate = options.skipStoreUpdate || false;
 
-    return this._batch(items, 'PATCH', false);
+    return this._batch(items, actionName, skipStoreUpdate);
   },
 
   batchDelete(items) {
